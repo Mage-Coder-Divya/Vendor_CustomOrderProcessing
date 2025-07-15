@@ -13,7 +13,7 @@ interface OrderStatusUpdateInterface
      *
      * @param string $orderIncrementId The order increment ID
      * @param string $newStatus The new status to apply
-     * @return array Response indicating success or failure.
+     * @return \Vendor\CustomOrderProcessing\Api\Data\OrderStatusResponseInterface
      */
-    public function updateStatus(string $orderIncrementId, string $newStatus);
+    public function updateStatus(string $orderIncrementId, string $newStatus): \Vendor\CustomOrderProcessing\Api\Data\OrderStatusResponseInterface;
 }

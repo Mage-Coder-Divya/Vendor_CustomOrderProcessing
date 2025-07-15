@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Vendor\CustomOrderProcessing\Model;
 
 use Vendor\CustomOrderProcessing\Api\OrderStatusUpdateInterface;
+use Vendor\CustomOrderProcessing\Api\Data\OrderStatusResponseInterface;
+use Vendor\CustomOrderProcessing\Model\Data\OrderStatusResponse;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Webapi\Exception as WebapiException;
@@ -25,17 +27,25 @@ class OrderStatusUpdate implements OrderStatusUpdateInterface
     private OrderCollectionFactory $orderCollectionFactory;
 
     /**
+     * @var OrderStatusResponseInterface
+     */
+    private OrderStatusResponseInterface $response;
+
+    /**
      * Constructor
      *
      * @param OrderRepositoryInterface $orderRepository
      * @param OrderCollectionFactory $orderCollectionFactory
+     * @param OrderStatusResponseInterface $response
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        OrderCollectionFactory $orderCollectionFactory
+        OrderCollectionFactory $orderCollectionFactory,
+        OrderStatusResponseInterface $response
     ) {
         $this->orderRepository = $orderRepository;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->response = $response;
     }
 
     /**
@@ -43,13 +53,12 @@ class OrderStatusUpdate implements OrderStatusUpdateInterface
      *
      * @param string $orderIncrementId
      * @param string $newStatus
-     * @return array
+     * @return OrderStatusResponseInterface
      * @throws WebapiException
      */
-    public function updateStatus(string $orderIncrementId, string $newStatus): array
+    public function updateStatus(string $orderIncrementId, string $newStatus): OrderStatusResponseInterface
     {
         try {
-            // Get order entity ID from increment ID
             $orderCollection = $this->orderCollectionFactory->create()
                 ->addFieldToFilter('increment_id', $orderIncrementId)
                 ->setPageSize(1);
@@ -60,7 +69,6 @@ class OrderStatusUpdate implements OrderStatusUpdateInterface
                 throw new WebapiException(__('Order not found'));
             }
 
-            // Load order using repository
             $order = $this->orderRepository->get((int)$order->getEntityId());
 
             $currentStatus = $order->getStatus();
@@ -78,10 +86,9 @@ class OrderStatusUpdate implements OrderStatusUpdateInterface
             $order->addStatusHistoryComment(__('Order status updated via API to "%1".', $newStatus));
             $this->orderRepository->save($order);
 
-            return [
-                'success' => true,
-                'message' => 'Order status updated successfully'
-            ];
+            return $this->response
+                ->setSuccess(true)
+                ->setMessage('Order status updated successfully');
         } catch (LocalizedException $e) {
             throw new WebapiException(__($e->getMessage()));
         } catch (\Exception $e) {

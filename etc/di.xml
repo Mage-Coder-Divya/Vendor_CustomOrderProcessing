@@ -3,4 +3,6 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Vendor\CustomOrderProcessing\Api\OrderStatusUpdateInterface"
                 type="Vendor\CustomOrderProcessing\Model\OrderStatusUpdate"/>
+    <preference for="Vendor\CustomOrderProcessing\Api\Data\OrderStatusResponseInterface" 
+                type="Vendor\CustomOrderProcessing\Model\Data\OrderStatusResponse"/>
 </config>
