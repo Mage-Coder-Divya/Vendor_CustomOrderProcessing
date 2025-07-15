@@ -22,15 +22,16 @@ This Magento 2 module allows updating the order status programmatically through 
 
 2. **Enable Module**
    bin/magento module:enable Vendor_CustomOrderProcessing
+   
    bin/magento setup:upgrade
+
    bin/magento cache:flush
 
 ## Architectural Decisions
 
 1. Order Status Validation
-   The order status is only updated if it is valid for the current order state, using
-   $order->getConfig()->getStateStatuses($order->getState())
-
+   The order status is only updated if it is valid for the current order state
+   
 2. Order Repository
    Used Magento's OrderRepositoryInterface to load and save orders to ensure we follow Magento service contracts.
 
